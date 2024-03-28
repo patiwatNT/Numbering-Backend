@@ -12,39 +12,31 @@ import jakarta.persistence.*;
  * @author NT2_Admin
  */
 @Entity
-@Table(name = "SERVICE_CENTER")
-public class ServiceCenter implements Serializable {
+@Table(name = "NUMBERING_REPORT")
+public class NumberingReport implements Serializable {
 
     @Id
     @Basic(optional = false)
-    @Column(name = "ID")
-    private String id;
-    @Column(name = "LOCATION")
-    private String location;
+    @Column(name = "NO")
+    private String no;
     @Column(name = "NAME")
     private String name;
+    @Column(name = "DESCRIPTION")
+    private String description;
 
-    public ServiceCenter() {
+    public NumberingReport() {
     }
 
-    public ServiceCenter(String id) {
-        this.id = id;
+    public NumberingReport(String no) {
+        this.no = no;
     }
 
-    public String getId() {
-        return id;
+    public String getNo() {
+        return no;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    public void setNo(String no) {
+        this.no = no;
     }
 
     public String getName() {
@@ -55,21 +47,29 @@ public class ServiceCenter implements Serializable {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (no != null ? no.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ServiceCenter)) {
+        if (!(object instanceof NumberingReport)) {
             return false;
         }
-        ServiceCenter other = (ServiceCenter) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        NumberingReport other = (NumberingReport) object;
+        if ((this.no == null && other.no != null) || (this.no != null && !this.no.equals(other.no))) {
             return false;
         }
         return true;
@@ -77,7 +77,7 @@ public class ServiceCenter implements Serializable {
 
     @Override
     public String toString() {
-        return "com.mycompany.genentities.ServiceCenter[ id=" + id + " ]";
+        return "com.mycompany.genentities.NumberingReport[ no=" + no + " ]";
     }
     
 }

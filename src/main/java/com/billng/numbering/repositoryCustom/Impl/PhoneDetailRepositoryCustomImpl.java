@@ -6,6 +6,7 @@ import com.billng.numbering.mapper.PhoneDetailMapper;
 import com.billng.numbering.repositoryCustom.PhoneDetailRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -26,6 +27,18 @@ public class PhoneDetailRepositoryCustomImpl implements PhoneDetailRepositoryCus
         }catch (Exception e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public void updateServiceLocation(PhoneDetailDto phoneDetailDto) {
+        try{
+            String serviceLocation = phoneDetailDto.getServiceLocation();
+            String phoneNumber = phoneDetailDto.getPhoneNumber();
+            String query = "UPDATE " + tableName + " SET SERVICE_LOCATION = '"+serviceLocation+"' WHERE PHONE_NUMBER = '" + phoneNumber + "'";
+            entityManager.createNativeQuery(query).executeUpdate();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

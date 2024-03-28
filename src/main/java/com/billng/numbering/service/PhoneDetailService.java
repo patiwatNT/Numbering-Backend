@@ -2,14 +2,15 @@ package com.billng.numbering.service;
 
 import com.billng.numbering.dto.ConfigCodeDto;
 import com.billng.numbering.dto.PhoneDetailDto;
+import com.billng.numbering.dto.ServiceLocationDto;
 import com.billng.numbering.entities.PhoneDetail;
 import com.billng.numbering.entities.PhoneDetailPK;
 import com.billng.numbering.mapper.PhoneDetailMapper;
+import com.billng.numbering.mapper.ServiceLocationMapper;
 import com.billng.numbering.repository.PhoneDetailRepository;
+import com.billng.numbering.repository.ServiceLocationRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,29 +29,56 @@ public class PhoneDetailService {
 
     private Map<String,String> configcodeMap = new HashMap<>();
 
+    private Map<String,String> serviceLocationMap = new HashMap<>();
+
     @Autowired
     private ConfigCodeService configCodeService;
+
+    @Autowired
+    private ServiceLocationService serviceLocationService;
+
+    @Autowired
+    private ServiceLocationRepository serviceLocationRepository;
+
+    @Autowired
+    private ServiceLocationMapper serviceLocationMapper;
 
     public PhoneDetailService(PhoneDetailRepository repository, PhoneDetailMapper phoneDetailMapper) {
         this.repository = repository;
         this.phoneDetailMapper = phoneDetailMapper;
     }
 
+    public void updateServiceLocation(PhoneDetailDto phoneDetailDto){
+        String serviceLocation = phoneDetailDto.getServiceLocation();
+        String phoneNumber = phoneDetailDto.getPhoneNumber();
+        log.info("{}",serviceLocation);
+        log.info("{}",phoneNumber);
+        repository.updateServiceLocation(phoneDetailDto);
+    }
 
     public List<PhoneDetailDto> findByAssignRangeId(String assignRangeId){
         List<PhoneDetailDto> phoneDetailDtoList = repository.findByAssignRangeId(assignRangeId);
         List<ConfigCodeDto> configCodeDtoList = configCodeService.findByStatusGroup("WEB_CONFIG");
+        List<ServiceLocationDto> serviceLocationDtoList = serviceLocationMapper.toDto(serviceLocationRepository.findAll());
         List<PhoneDetailDto> newPhoneDetailDtoList = new ArrayList<>();
         for(ConfigCodeDto temp:configCodeDtoList){
             configcodeMap.put(temp.getStatusCode(),temp.getStatusDescription());
+        }
+        for(ServiceLocationDto temp : serviceLocationDtoList){
+            serviceLocationMap.put(temp.getServiceLocationPK().getServiceLocationId(), temp.getName());
         }
         for(PhoneDetailDto temp:phoneDetailDtoList){
             String crmStatus = temp.getCrmStatus();
             if(configcodeMap.containsKey(crmStatus)){
                 temp.setCrmStatus(configcodeMap.get(crmStatus));
-                newPhoneDetailDtoList.add(temp);
+
             }
+            if(serviceLocationMap.containsKey(temp.getServiceLocation())){
+                temp.setServiceLocation(temp.getServiceLocation()+" : "+ serviceLocationMap.get(temp.getServiceLocation()));
+            }
+            newPhoneDetailDtoList.add(temp);
         }
+
         return newPhoneDetailDtoList;
     }
 

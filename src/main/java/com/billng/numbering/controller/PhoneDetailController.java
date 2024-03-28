@@ -34,6 +34,12 @@ public class PhoneDetailController {
         return phoneDetailService.findByAssignRangeId(assignRangeId);
     }
 
+    @PostMapping("/updateServiceLocation")
+    public ResponseEntity<Void> updateServiceLocation(@RequestBody PhoneDetailDto phoneDetailDto){
+        phoneDetailService.updateServiceLocation(phoneDetailDto);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping
     public ResponseEntity<Void> save(@RequestBody @Validated PhoneDetailDto phoneDetailDto) {
         phoneDetailService.save(phoneDetailDto);

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface PhoneDetailRepositoryCustom {
     List<PhoneDetailDto> findByAssignRangeId(String assignRangeId);
+    void updateServiceLocation(PhoneDetailDto phoneDetailDto);
 }
