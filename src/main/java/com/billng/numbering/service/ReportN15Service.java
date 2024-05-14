@@ -1,6 +1,7 @@
 package com.billng.numbering.service;
 
 import com.billng.numbering.dto.ReportN15Dto;
+import com.billng.numbering.dtoC.NbrReportN15;
 import com.billng.numbering.entities.ReportN15;
 import com.billng.numbering.mapper.ReportN15Mapper;
 import com.billng.numbering.repository.ReportN15Repository;
@@ -29,8 +30,8 @@ public class ReportN15Service {
         this.reportN15Mapper = reportN15Mapper;
     }
 
-    public List<ReportN15Dto> findAll(){
-        return reportN15Mapper.toDto(repository.findAll());
+    public List<NbrReportN15> findAll(){
+        return repository.findReportN15();
     }
 
     public ReportN15Dto save(ReportN15Dto reportN15Dto) {

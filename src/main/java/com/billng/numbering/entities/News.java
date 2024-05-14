@@ -15,7 +15,7 @@ import java.util.Date;
  * @author Billing
  */
 @Entity
-@Table(name = "NEWS")
+@Table(name = "NBR_NEWS")
 public class News implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -14,7 +14,7 @@ import java.util.Date;
  * @author Billing
  */
 @Entity
-@Table(name = "CONFIG_CODE")
+@Table(name = "NBR_CONFIG_CODE")
 public class ConfigCode implements Serializable {
 
     @Id

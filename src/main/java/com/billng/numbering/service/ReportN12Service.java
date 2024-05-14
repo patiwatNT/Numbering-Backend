@@ -1,6 +1,7 @@
 package com.billng.numbering.service;
 
 import com.billng.numbering.dto.ReportN12Dto;
+import com.billng.numbering.dtoC.NbrReportN12;
 import com.billng.numbering.entities.ReportN12;
 import com.billng.numbering.mapper.ReportN12Mapper;
 import com.billng.numbering.repository.ReportN12Repository;
@@ -29,8 +30,8 @@ public class ReportN12Service {
         this.reportN12Mapper = reportN12Mapper;
     }
 
-    public List<ReportN12Dto> findAll(){
-        return reportN12Mapper.toDto(repository.findAll());
+    public List<NbrReportN12> findAll(){
+        return repository.findReportN12();
     }
 
     public ReportN12Dto save(ReportN12Dto reportN12Dto) {

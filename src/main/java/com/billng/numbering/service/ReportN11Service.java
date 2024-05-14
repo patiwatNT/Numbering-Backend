@@ -1,14 +1,13 @@
 package com.billng.numbering.service;
 
-import com.billng.numbering.dto.ConfigCodeDto;
 import com.billng.numbering.dto.ReportN11Dto;
+import com.billng.numbering.dtoC.ReportN11Active;
+import com.billng.numbering.dtoC.ReportN11InactiveAndInProgress;
 import com.billng.numbering.entities.ReportN11;
 import com.billng.numbering.mapper.ReportN11Mapper;
 import com.billng.numbering.repository.ReportN11Repository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,7 +35,18 @@ public class ReportN11Service {
     }
 
     public List<ReportN11Dto> findAll(){
+
         return reportN11Mapper.toDto(repository.findAll());
+    }
+
+    public List<ReportN11Active> findAllReportActive(){
+        return repository.findAllReportActive();
+    }
+    public List<ReportN11InactiveAndInProgress> findAllReportInactive(){
+        return  repository.findAllReportInactive();
+    }
+    public List<ReportN11InactiveAndInProgress> findAllReportInProgress(){
+        return repository.findAllReportInProgress();
     }
 
     public ReportN11Dto save(ReportN11Dto reportN11Dto) {

@@ -1,6 +1,7 @@
 package com.billng.numbering.controller;
 
 import com.billng.numbering.dto.ReportN13Dto;
+import com.billng.numbering.dtoC.NbrReportN13;
 import com.billng.numbering.entities.ReportN13;
 import com.billng.numbering.mapper.ReportN13Mapper;
 import com.billng.numbering.service.ReportN13Service;
@@ -39,7 +40,7 @@ public class ReportN13Controller {
     }
 
     @GetMapping("/findAll")
-    public List<ReportN13Dto> findAll(){
+    public List<NbrReportN13> findAll(){
         return reportN13Service.findAll();
     }
 

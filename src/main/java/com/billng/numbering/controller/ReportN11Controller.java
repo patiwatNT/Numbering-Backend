@@ -1,16 +1,12 @@
 package com.billng.numbering.controller;
 
 import com.billng.numbering.dto.ReportN11Dto;
-import com.billng.numbering.dtoC.LoginForm;
-import com.billng.numbering.entities.ReportN11;
-import com.billng.numbering.mapper.ReportN11Mapper;
-import com.billng.numbering.service.LoginService;
+import com.billng.numbering.dtoC.ReportN11Active;
+import com.billng.numbering.dtoC.ReportN11InactiveAndInProgress;
 import com.billng.numbering.service.ReportN11Service;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequestMapping("/report-n-11")
 @RestController
@@ -44,6 +39,21 @@ public class ReportN11Controller {
     @GetMapping("findAll")
     public List<ReportN11Dto> findAll(){
         return reportN11Service.findAll();
+    }
+
+    @GetMapping("/findReportN11Active")
+    public List<ReportN11Active> findAllReportActive(){
+        return reportN11Service.findAllReportActive();
+    }
+
+    @GetMapping("/findReportN11Inactive")
+    public List<ReportN11InactiveAndInProgress> findAllReportInactive(){
+        return reportN11Service.findAllReportInactive();
+    }
+
+    @GetMapping("/findReportN11InProgress")
+    public List<ReportN11InactiveAndInProgress> findAllReportInProgress(){
+        return reportN11Service.findAllReportInProgress();
     }
 
     @GetMapping("/{id}")

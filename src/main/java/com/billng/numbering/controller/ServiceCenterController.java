@@ -24,11 +24,17 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @Api("service-center")
+@CrossOrigin(allowedHeaders = "*",origins = "*")
 public class ServiceCenterController {
     private final ServiceCenterService serviceCenterService;
 
     public ServiceCenterController(ServiceCenterService serviceCenterService) {
         this.serviceCenterService = serviceCenterService;
+    }
+
+    @GetMapping("/findAll")
+    public List<ServiceCenterDto> findAll(){
+        return serviceCenterService.findAll();
     }
 
     @PostMapping
