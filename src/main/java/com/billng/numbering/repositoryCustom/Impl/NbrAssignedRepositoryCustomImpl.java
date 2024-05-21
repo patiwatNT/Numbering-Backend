@@ -58,7 +58,7 @@ public class NbrAssignedRepositoryCustomImpl implements NbrAssignedRepositoryCus
     @Override
     public List<NbrAssignedDto> findByCriteria(String query) {
         try{
-            String queryString = "Select * From " + tableName + " Where " + query;
+            String queryString = "Select * From " + tableName + " Where " + query + " order by assigned_start ";
             return nbrAssignedMapper.toDto(entityManager.createNativeQuery(queryString, NbrAssigned.class).getResultList());
         }catch (Exception e){
             e.printStackTrace();
@@ -70,6 +70,17 @@ public class NbrAssignedRepositoryCustomImpl implements NbrAssignedRepositoryCus
     public List<String> findAssignedRegion() {
         try{
             String queryString = "Select DISTINCT assigned_region From " + tableName + " order by assigned_region";
+            return entityManager.createNativeQuery(queryString,String.class).getResultList();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<String> findAssignedDept() {
+        try{
+            String queryString = "Select DISTINCT assigned_dept From " + tableName + " order by assigned_dept";
             return entityManager.createNativeQuery(queryString,String.class).getResultList();
         }catch (Exception e){
             e.printStackTrace();
@@ -143,7 +154,7 @@ public class NbrAssignedRepositoryCustomImpl implements NbrAssignedRepositoryCus
                     "            ) C ON A.assigned_id = C.assigned_id\n" +
                     "    ) Q ON A.assigned_id = Q.assigned_id\n" +
                     "\t where "+query+"\n"+
-                    "\torder by A.assigned_id";
+                    "\torder by A.assigned_start";
             return entityManager.createNativeQuery(queryString,NbrAssignedAmount.class).getResultList();
         }catch (Exception e){
             e.printStackTrace();

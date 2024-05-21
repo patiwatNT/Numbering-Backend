@@ -2,6 +2,8 @@ package com.billng.numbering.controller;
 
 import com.billng.numbering.dto.AssignedDto;
 import com.billng.numbering.dto.NbrAssignedDto;
+import com.billng.numbering.dtoC.AssignedRange;
+import com.billng.numbering.dtoC.AssignedRangeDetail;
 import com.billng.numbering.dtoC.AssignedRangeDtoC;
 import com.billng.numbering.dtoC.NbrAssignedAmount;
 import com.billng.numbering.entities.NbrAssigned;
@@ -46,6 +48,24 @@ public class NbrAssignedController {
         return nbrAssignedService.findAssignedAmount(assignedRangeDtoC);
     }
 
+    @PostMapping("/addAssignedRange")
+    public ResponseEntity<String> addAssignedRange(@RequestBody AssignedRange assignedRange){
+        String response =  nbrAssignedService.addAssignedRange(assignedRange);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/editAssignedRange")
+    public ResponseEntity<String> editAssignedRange(@RequestBody AssignedRange assignedRange){
+        String response =  nbrAssignedService.editAssignedRange(assignedRange);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/editAssignedRangeDetail")
+    public ResponseEntity<String> editAssignedRangeDetail(@RequestBody AssignedRangeDetail assignedRangeDetail){
+        String response =  nbrAssignedService.editAssignedRangeDetail(assignedRangeDetail);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/findByAssignedId/{id}")
     public NbrAssignedDto findByAssignedId(@PathVariable("id") String id){
         return nbrAssignedService.findByAssignedId(id);
@@ -56,9 +76,15 @@ public class NbrAssignedController {
         return nbrAssignedService.findByCriteria(assignedRangeDtoC);
     }
 
+
     @GetMapping("/findAssignedRegion")
     public List<String> findAssignedRegion(){
         return nbrAssignedService.findAssignedRegion();
+    }
+
+    @GetMapping("/findAssignedDept")
+    public List<String> findAssignedDept(){
+        return nbrAssignedService.findAssignedDept();
     }
 
     @GetMapping("/findAssignedSector")

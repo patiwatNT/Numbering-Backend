@@ -17,7 +17,10 @@ public interface NbrAssignedRepositoryCustom {
 
     List<String> findAssignedRegion();
 
+    List<String> findAssignedDept();
+
     List<String> findAssignedSector();
+
 
     List<NbrAssignedAmount> findAssignedAmount(String query);
 

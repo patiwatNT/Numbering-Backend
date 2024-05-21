@@ -1,11 +1,15 @@
 package com.billng.numbering.service;
 
 import com.billng.numbering.dto.*;
+import com.billng.numbering.dtoC.AssignedRange;
+import com.billng.numbering.dtoC.AssignedRangeDetail;
 import com.billng.numbering.dtoC.AssignedRangeDtoC;
 import com.billng.numbering.dtoC.NbrAssignedAmount;
 import com.billng.numbering.entities.NbrAssigned;
 import com.billng.numbering.mapper.NbrAssignedMapper;
+import com.billng.numbering.mapper.NbrServiceNumbersMapper;
 import com.billng.numbering.repository.NbrAssignedRepository;
+import com.billng.numbering.repository.NbrServiceNumbersRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,10 +24,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -31,6 +34,12 @@ import java.util.Optional;
 public class NbrAssignedService {
     private final NbrAssignedRepository repository;
     private final NbrAssignedMapper nbrAssignedMapper;
+
+    @Autowired
+    private NbrServiceNumbersMapper nbrServiceNumbersMapper;
+
+    @Autowired
+    private NbrServiceNumbersRepository nbrServiceNumbersRepository;
 
     @Autowired
     private NbrProvidersService nbrProvidersService;
@@ -45,30 +54,164 @@ public class NbrAssignedService {
         return nbrAssignedMapper.toDto(repository.save(entity));
     }
 
-    public List<NbrAssignedAmount> findAssignedAmount(AssignedRangeDtoC assignedRangeDtoC){
+    public String editAssignedRange(AssignedRange assignedRange) {
+        String startTel = assignedRange.getBlockStart();
+        String endTel = assignedRange.getBlockEnd();
+        String serviceLocation = assignedRange.getSelectedLocation();
+        int blockId = assignedRange.getBlockId();
+        int providerId = assignedRange.getProviderId();
+        String empCode = assignedRange.getEmpCode();
+        int assignedId = assignedRange.getAssignedId();
+        Date date = new Date();
+        List<NbrServiceNumbersDto> newNbrServiceNumbersDtoList = nbrServiceNumbersRepository.findServiceNumberRange(startTel, endTel);
+        List<NbrServiceNumbersDto> oldNbrServiceNumbersDtoList = nbrServiceNumbersRepository.findByAssignedId(assignedId);
+        List<NbrServiceNumbersDto> tempList = new ArrayList<>();
+        if (oldNbrServiceNumbersDtoList != null) {
+            // Check New range is null
+            for (NbrServiceNumbersDto obj : newNbrServiceNumbersDtoList) {
+                if (!oldNbrServiceNumbersDtoList.contains(obj)) {
+                    tempList.add(obj);
+                    //newNbrServiceNumbersDtoList.remove(obj);
+                }
+            }
+            boolean allNullAssignedId = tempList.stream()
+                    .allMatch(obj -> obj.getAssignedId() == null);
+
+            // Delete old range
+            for(NbrServiceNumbersDto dto:oldNbrServiceNumbersDtoList){
+                dto.setAssignedId(null);
+                dto.setLocationCode(null);
+                dto.setModifiedBy(empCode);
+                dto.setLastModified(new Date());
+            }
+            nbrServiceNumbersRepository.saveAll(nbrServiceNumbersMapper.toEntity(oldNbrServiceNumbersDtoList));
+
+            if (allNullAssignedId) {
+                System.out.println("All Assigned is Null");
+                // Update NBR_ASSIGNED
+                NbrAssignedDto nbrAssignedDto = new NbrAssignedDto();
+                nbrAssignedDto.setAssignedId(assignedId);
+                nbrAssignedDto.setAssignedStart(startTel);
+                nbrAssignedDto.setAssignedEnd(endTel);
+                nbrAssignedDto.setAssignedQty((Integer.parseInt(endTel) - Integer.parseInt(startTel)) + 1);
+                nbrAssignedDto.setAssignedLocationCode(serviceLocation);
+                nbrAssignedDto.setBlockId(blockId);
+                nbrAssignedDto.setProviderId(providerId);
+                save(nbrAssignedDto);
+
+                // Update location_code,assigned_id,modified_by,last_modified
+                for (NbrServiceNumbersDto temp : newNbrServiceNumbersDtoList) {
+                    temp.setAssignedId(assignedId);
+                    temp.setLocationCode(serviceLocation);
+                    temp.setModifiedBy(empCode);
+                    temp.setLastModified(new Date());
+                }
+                nbrServiceNumbersRepository.saveAll(nbrServiceNumbersMapper.toEntity(newNbrServiceNumbersDtoList));
+
+                //return "เพิ่มช่วง Assigned สำเร็จ";
+                return "Success";
+            } else {
+                //return "หมายเลขในช่วง Assigned ใหม่มีการ Assigned ช่วงไปแล้ว";
+                return "Failed";
+            }
+            // Delete assigned_id from old service_number in assignedRange
+
+        } else {
+            return null;
+        }
+    }
+
+    public String editAssignedRangeDetail(AssignedRangeDetail assignedRangeDetail){
+        int assignedId = assignedRangeDetail.getAssignedId();
+        NbrAssignedDto nbrAssignedDto = repository.findByAssignedId(String.valueOf(assignedId));
+        nbrAssignedDto.setAssignedDept(assignedRangeDetail.getAssignedDept());
+        nbrAssignedDto.setAssignedRegion(assignedRangeDetail.getAssignedRegion());
+        nbrAssignedDto.setAssignedSector(assignedRangeDetail.getAssignedSector());
+        nbrAssignedDto.setDocRef(assignedRangeDetail.getDocRef());
+        nbrAssignedDto.setProvince(assignedRangeDetail.getProvince());
+        nbrAssignedDto.setServiceType(assignedRangeDetail.getServiceType());
+        nbrAssignedDto.setStationAbbr(assignedRangeDetail.getStationAbbr());
+        nbrAssignedDto.setStationCode(assignedRangeDetail.getStationCode());
+        nbrAssignedDto.setStationCodeTtt(assignedRangeDetail.getStationCodeTtt());
+        nbrAssignedDto.setStationNameEn(assignedRangeDetail.getStationNameEn());
+        save(nbrAssignedDto);
+        return "Success";
+    }
+
+    public String addAssignedRange(AssignedRange assignedRange) {
+        String startTel = assignedRange.getBlockStart();
+        String endTel = assignedRange.getBlockEnd();
+        String serviceLocation = assignedRange.getSelectedLocation();
+        int blockId = assignedRange.getBlockId();
+        int providerId = assignedRange.getProviderId();
+        String empCode = assignedRange.getEmpCode();
+        List<NbrAssigned> nbrAssignedList = repository.findAll();
+        int lastAssignedId = nbrAssignedList.getLast().getAssignedId() + 1;
+        List<NbrServiceNumbersDto> nbrServiceNumberDtoList = nbrServiceNumbersRepository.findServiceNumberRange(startTel, endTel);
+        if (nbrServiceNumberDtoList != null) {
+            boolean allNullAssignedId = nbrServiceNumberDtoList.stream()
+                    .allMatch(obj -> obj.getAssignedId() == null);
+            if (allNullAssignedId) {
+                System.out.println("All Assigned is Null");
+                // Insert NBR_ASSIGNED
+                NbrAssignedDto nbrAssignedDto = new NbrAssignedDto();
+                nbrAssignedDto.setAssignedId(lastAssignedId);
+                nbrAssignedDto.setAssignedStart(startTel);
+                nbrAssignedDto.setAssignedEnd(endTel);
+                nbrAssignedDto.setAssignedQty((Integer.parseInt(endTel) - Integer.parseInt(startTel)) + 1);
+                nbrAssignedDto.setAssignedLocationCode(serviceLocation);
+                nbrAssignedDto.setBlockId(blockId);
+                nbrAssignedDto.setProviderId(providerId);
+                save(nbrAssignedDto);
+
+                // Update location_code,assigned_id,modified_by,last_modified
+                for (NbrServiceNumbersDto temp : nbrServiceNumberDtoList) {
+                    temp.setAssignedId(lastAssignedId);
+                    temp.setLocationCode(serviceLocation);
+                    temp.setModifiedBy(empCode);
+                    temp.setLastModified(new Date());
+                    nbrServiceNumbersRepository.save(nbrServiceNumbersMapper.toEntity(temp));
+                }
+
+                //return "เพิ่มช่วง Assigned สำเร็จ";
+                return "Success";
+            } else {
+                //return "หมายเลขในช่วง Assigned ใหม่มีการ Assigned ช่วงไปแล้ว";
+                return "Failed";
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public List<NbrAssignedAmount> findAssignedAmount(AssignedRangeDtoC assignedRangeDtoC) {
         String query = buildQueryAmount(assignedRangeDtoC);
         return repository.findAssignedAmount(query);
     }
 
-    public NbrAssignedDto findByAssignedId(String id){
-        if(!Objects.equals(id, "null")){
+    public NbrAssignedDto findByAssignedId(String id) {
+        if (!Objects.equals(id, "null")) {
             return repository.findByAssignedId(id);
         }
         return null;
     }
 
-    public List<String> findAssignedRegion(){
+    public List<String> findAssignedRegion() {
         return repository.findAssignedRegion();
     }
 
-    public List<String> findAssignedSector(){
+    public List<String> findAssignedDept() {
+        return repository.findAssignedDept();
+    }
+
+    public List<String> findAssignedSector() {
         return repository.findAssignedSector();
     }
 
-    public List<NbrAssignedDto> findByCriteria(AssignedRangeDtoC assignedRangeDtoC){
-        log.info("{}",assignedRangeDtoC);
+    public List<NbrAssignedDto> findByCriteria(AssignedRangeDtoC assignedRangeDtoC) {
+        log.info("{}", assignedRangeDtoC);
         String query = buildQuery(assignedRangeDtoC);
-        List<NbrAssignedDto> nbrAssignedDtoList = repository.findByCriteria(query);
+        List<NbrAssignedDto> nbrServiceNumberDtoList = repository.findByCriteria(query);
 //        for(NumberingLocationDto temp: numberingLocationDtoList){
 //            locationMap.put(temp.getValue(),temp.getName());
 //        }
@@ -81,15 +224,15 @@ public class NbrAssignedService {
 //            }
 //            newAssignedRangeDtoList.add(temp);
 //        }
-        return nbrAssignedDtoList;
+        return nbrServiceNumberDtoList;
     }
 
-    public List<AssignedDto> findAllAssigned(){
+    public List<AssignedDto> findAllAssigned() {
         List<AssignedDto> assignedDtoList = new ArrayList<>();
         List<NbrProvidersDto> nbrProvidersDtoList = nbrProvidersService.findAll();
-        for(int i=0;i<nbrProvidersDtoList.size()-1;i++){
+        for (int i = 0; i < nbrProvidersDtoList.size() - 1; i++) {
             AssignedDto assignedDto = new AssignedDto();
-            assignedDto.setNo(BigDecimal.valueOf(i+1));
+            assignedDto.setNo(BigDecimal.valueOf(i + 1));
             assignedDto.setProvider(nbrProvidersDtoList.get(i).getProviderName());
             assignedDto.setProviderDescription(nbrProvidersDtoList.get(i).getProviderDesc());
             int countAssigned = repository.countAssignedByProviderId(nbrProvidersDtoList.get(i).getProviderId());

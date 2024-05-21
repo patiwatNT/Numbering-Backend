@@ -9,4 +9,6 @@ public interface NbrServiceNumbersRepositoryCustom {
     List<NbrServiceNumbersDto> findByAssignedId(int assignedId);
 
     void updateServiceLocation(NbrServiceNumbersDto nbrServiceNumbersDto);
+
+    List<NbrServiceNumbersDto> findServiceNumberRange(String startTel,String endTel);
 }

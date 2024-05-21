@@ -5,9 +5,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
-
+@EqualsAndHashCode(callSuper = false)
 @ApiModel()
 public class NbrServiceNumbersDto extends AbstractDto<String> {
     private long serialVersionUID;
