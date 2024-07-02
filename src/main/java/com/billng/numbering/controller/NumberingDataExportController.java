@@ -1,6 +1,7 @@
 package com.billng.numbering.controller;
 
 import com.billng.numbering.dto.NumberingDataExportDto;
+import com.billng.numbering.dtoC.DataExport;
 import com.billng.numbering.entities.NumberingDataExport;
 import com.billng.numbering.mapper.NumberingDataExportMapper;
 import com.billng.numbering.service.NumberingDataExportService;
@@ -41,6 +42,11 @@ public class NumberingDataExportController {
     @GetMapping("/findAll")
     public List<NumberingDataExportDto> findAll(){
         return numberingDataExportService.findAll();
+    }
+
+    @GetMapping("/exportData/{providerId}")
+    public List<DataExport> exportData(@PathVariable("providerId") String providerId){
+        return numberingDataExportService.exportData(providerId);
     }
 
     @GetMapping("/{id}")

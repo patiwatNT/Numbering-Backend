@@ -1,6 +1,7 @@
 package com.billng.numbering.service;
 
 import com.billng.numbering.dto.NumberingDataExportDto;
+import com.billng.numbering.dtoC.DataExport;
 import com.billng.numbering.entities.NumberingDataExport;
 import com.billng.numbering.mapper.NumberingDataExportMapper;
 import com.billng.numbering.repository.NumberingDataExportRepository;
@@ -36,6 +37,10 @@ public class NumberingDataExportService {
     public NumberingDataExportDto save(NumberingDataExportDto numberingDataExportDto) {
         NumberingDataExport entity = numberingDataExportMapper.toEntity(numberingDataExportDto);
         return numberingDataExportMapper.toDto(repository.save(entity));
+    }
+
+    public List<DataExport> exportData(String providerId){
+        return repository.exportData(providerId);
     }
 
     public void deleteById(String id) {

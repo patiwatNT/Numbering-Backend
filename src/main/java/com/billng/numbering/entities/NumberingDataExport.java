@@ -14,7 +14,7 @@ import java.math.BigInteger;
  * @author NT2_Admin
  */
 @Entity
-@Table(name = "NUMBERING_DATA_EXPORT")
+@Table(name = "NBR_DATA_EXPORT")
 public class NumberingDataExport implements Serializable {
 
     @Id
@@ -31,8 +31,6 @@ public class NumberingDataExport implements Serializable {
     private String columnDelimiter;
     @Column(name = "FIELD_NAME")
     private String fieldName;
-    @Column(name = "DATA_AMOUNT")
-    private BigInteger dataAmount;
 
     public NumberingDataExport() {
     }
@@ -87,14 +85,6 @@ public class NumberingDataExport implements Serializable {
 
     public void setFieldName(String fieldName) {
         this.fieldName = fieldName;
-    }
-
-    public BigInteger getDataAmount() {
-        return dataAmount;
-    }
-
-    public void setDataAmount(BigInteger dataAmount) {
-        this.dataAmount = dataAmount;
     }
 
     @Override

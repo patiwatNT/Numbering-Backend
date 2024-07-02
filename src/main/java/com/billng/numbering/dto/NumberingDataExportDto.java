@@ -21,7 +21,6 @@ public class NumberingDataExportDto extends AbstractDto<String> {
     private String columnDelimiter;
     @Size(max = 255)
     private String fieldName;
-    private BigInteger dataAmount;
 
     public NumberingDataExportDto() {
     }
@@ -72,13 +71,5 @@ public class NumberingDataExportDto extends AbstractDto<String> {
 
     public String getFieldName() {
         return this.fieldName;
-    }
-
-    public void setDataAmount(java.math.BigInteger dataAmount) {
-        this.dataAmount = dataAmount;
-    }
-
-    public java.math.BigInteger getDataAmount() {
-        return this.dataAmount;
     }
 }
